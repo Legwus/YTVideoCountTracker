@@ -5,9 +5,6 @@
     "description": "Tracks how many times you've watched a YouTube video.",
     "permissions": ["storage", "tabs", "webNavigation", "scripting"],
     "host_permissions": ["<all_urls>"],
-    "background": {
-      "service_worker": "background.js"
-    },
     "content_scripts": [
       {
         "matches": ["https://www.youtube.com/watch*"],

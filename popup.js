@@ -10,7 +10,7 @@ chrome.storage.local.get(null, function(result) {
       const videoData = result[videoTitle];
       const videoUrl = videoData.url || '#';
       link.href = videoUrl;
-      link.textContent = `Video ID: ${videoTitle} - Watched ${videoData.count || 0} times`;
+      link.textContent = `Video: ${videoTitle} - Watched ${videoData.count || 0} times`;
       link.target = "_blank";  // Open the link in a new tab
       
       li.appendChild(link);
