@@ -1,10 +1,15 @@
 
 let lastUrl = location.href;
+const url = location.href;
+// const url = window.location.href;
+// const title = videoTitle.getAttribute("title");
 
 function trackVideo(url){
     const videoTitle = document.querySelector('ytd-watch-metadata yt-formatted-string[title]');
     if (videoTitle) {
-        console.log("tytuł:" + videoTitle.getAttribute("title"));
+        const title = videoTitle.getAttribute("title");
+        console.log("tytuł:" + title);
+        saveVideoTitleAndCount(title,url);
     } else {
         console.log("cos sie wyjebalo");
     }
@@ -15,11 +20,28 @@ setInterval(() => {
         lastUrl = location.href;
         console.log("link sie zmienil na:", lastUrl);
         trackVideo(location.href);
+
     }
 
 
     
 }, 1000)
+
+function saveVideoTitleAndCount(title, url) {
+   
+    browser.storage.local.get([title], (result) => {
+
+        let data = result[title] || { count: 0, url: url };
+
+        data.count += 1;
+        
+        browser.storage.local.set({ [title]: data }, () => {
+            console.log(`Saved: ${title}, watched ${data.count} times.`);
+        });
+    });
+}
+
+
 
 
 
