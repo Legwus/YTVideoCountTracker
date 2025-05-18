@@ -1,26 +1,34 @@
 
 let lastUrl = location.href;
 const url = location.href;
+let lastTitleDOM = document.querySelector('ytd-watch-metadata yt-formatted-string[title]');
+let lastTitle = lastTitleDOM.getAttribute("title");
 // const url = window.location.href;
 // const title = videoTitle.getAttribute("title");
-
 function trackVideo(url){
     const videoTitle = document.querySelector('ytd-watch-metadata yt-formatted-string[title]');
     if (videoTitle) {
         const title = videoTitle.getAttribute("title");
         console.log("tytuł:" + title);
-        saveVideoTitleAndCount(title,url);
+        //  if ( location.href !== lastUrl  && document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title") !== lastTitle) {
+        // saveVideoTitleAndCount(title,url);
+        //  }
     } else {
         console.log("cos sie wyjebalo");
     }
    
 }
 setInterval(() => {
-    if ( location.href !== lastUrl ) {
+//  && document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title") !== lastTitle
+    if ( location.href !== lastUrl  && document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title") !== lastTitle) {
+        //let title = 
         lastUrl = location.href;
+        console.log("kebab: ", lastTitle , "kebabi: " , document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title"));
+        let title = document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title");
         console.log("link sie zmienil na:", lastUrl);
         trackVideo(location.href);
-
+        saveVideoTitleAndCount(title, lastUrl);
+        
     }
 
 
@@ -39,6 +47,7 @@ function saveVideoTitleAndCount(title, url) {
             console.log(`Saved: ${title}, watched ${data.count} times.`);
         });
     });
+    lastTitle = document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title");
 }
 
 
