@@ -1,33 +1,13 @@
 
 let lastUrl = location.href;
 const url = location.href;
-let lastTitleDOM = document.querySelector('ytd-watch-metadata yt-formatted-string[title]');
-let lastTitle = lastTitleDOM.getAttribute("title");
-// const url = window.location.href;
-// const title = videoTitle.getAttribute("title");
-function trackVideo(url){
-    const videoTitle = document.querySelector('ytd-watch-metadata yt-formatted-string[title]');
-    if (videoTitle) {
-        const title = videoTitle.getAttribute("title");
-        console.log("tytuł:" + title);
-        //  if ( location.href !== lastUrl  && document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title") !== lastTitle) {
-        // saveVideoTitleAndCount(title,url);
-        //  }
-    } else {
-        console.log("cos sie wyjebalo");
-    }
-   
-}
+
+
 setInterval(() => {
-//  && document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title") !== lastTitle
-    if ( location.href !== lastUrl  && document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title") !== lastTitle) {
-        //let title = 
+ 
+    if ( location.href !== lastUrl) {
+        
         lastUrl = location.href;
-        console.log("kebab: ", lastTitle , "kebabi: " , document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title"));
-        let title = document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title");
-        console.log("link sie zmienil na:", lastUrl);
-        trackVideo(location.href);
-        saveVideoTitleAndCount(title, lastUrl);
         
     }
 
@@ -35,19 +15,51 @@ setInterval(() => {
     
 }, 1000)
 
-function saveVideoTitleAndCount(title, url) {
-   
-    browser.storage.local.get([title], (result) => {
-
-        let data = result[title] || { count: 0, url: url };
-
-        data.count += 1;
-        
-        browser.storage.local.set({ [title]: data }, () => {
-            console.log(`Saved: ${title}, watched ${data.count} times.`);
-        });
+function observeTitle(retryCount = 0) {
+  const target = document.querySelector('ytd-watch-metadata h1 > yt-formatted-string');
+    console.log("attempting to start mutation observer");
+  if (target) {
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        if (mutation.type === 'childList' || mutation.type === 'characterData') {
+          console.log('Title changed:', target.textContent.trim());
+          saveVideoTitleAndCount(target.textContent.trim(), lastUrl);
+        }
+      }
     });
-    lastTitle = document.querySelector('ytd-watch-metadata yt-formatted-string[title]').getAttribute("title");
+
+    observer.observe(target, {
+      childList: true,
+      characterData: true,
+      subtree: true
+    });
+
+    console.log('Observer is now watching the title element.');
+  } else {
+    if (retryCount < 20) { // limit retries to avoid infinite loop
+      setTimeout(() => observeTitle(retryCount + 1), 500); // retry after 500ms
+    } else {
+      console.warn('Failed to find the title element after multiple attempts.');
+    }
+  }
+}
+
+observeTitle();
+
+function saveVideoTitleAndCount(title, url) {
+   setTimeout(() => {
+        browser.storage.local.get([title], (result) => {
+
+                let data = result[title] || { count: 0, url: url };
+
+                data.count += 1;
+                
+                browser.storage.local.set({ [title]: data }, () => {
+                    console.log(`Saved: ${title}, watched ${data.count} times.`);
+                });
+            });
+   }, 2000)
+   
 }
 
 
