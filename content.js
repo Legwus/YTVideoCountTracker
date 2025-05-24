@@ -4,20 +4,20 @@ const url = location.href;
 
 
 setInterval(() => {
- 
-    if ( location.href !== lastUrl) {
-        
-        lastUrl = location.href;
-        
-    }
+
+  if (location.href !== lastUrl) {
+
+    lastUrl = location.href;
+
+  }
 
 
-    
+
 }, 1000)
 
 function observeTitle(retryCount = 0) {
   const target = document.querySelector('ytd-watch-metadata h1 > yt-formatted-string');
-    console.log("attempting to start mutation observer");
+  console.log("attempting to start mutation observer");
   if (target) {
     const observer = new MutationObserver((mutationsList) => {
       for (const mutation of mutationsList) {
@@ -47,19 +47,19 @@ function observeTitle(retryCount = 0) {
 observeTitle();
 
 function saveVideoTitleAndCount(title, url) {
-   setTimeout(() => {
-        browser.storage.local.get([title], (result) => {
+  setTimeout(() => {
+    browser.storage.local.get([title], (result) => {
 
-                let data = result[title] || { count: 0, url: url };
+      let data = result[title] || { count: 0, url: url };
 
-                data.count += 1;
-                
-                browser.storage.local.set({ [title]: data }, () => {
-                    console.log(`Saved: ${title}, watched ${data.count} times.`);
-                });
-            });
-   }, 2000)
-   
+      data.count += 1;
+
+      browser.storage.local.set({ [title]: data }, () => {
+        console.log(`Saved: ${title}, watched ${data.count} times.`);
+      });
+    });
+  }, 2000)
+
 }
 
 
