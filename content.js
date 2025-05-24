@@ -48,13 +48,13 @@ observeTitle();
 
 function saveVideoTitleAndCount(title, url) {
    setTimeout(() => {
-        browser.storage.local.get([title], (result) => {
+        chrome.storage.local.get([title], (result) => {
 
                 let data = result[title] || { count: 0, url: url };
 
                 data.count += 1;
                 
-                browser.storage.local.set({ [title]: data }, () => {
+                chrome.storage.local.set({ [title]: data }, () => {
                     console.log(`Saved: ${title}, watched ${data.count} times.`);
                 });
             });

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const videoList = document.getElementById('videoList');
 
-  browser.storage.local.get(null).then((result) => {
+  chrome.storage.local.get(null).then((result) => {
     for (let videoTitle in result) {
       const li = document.createElement('li');
 
