@@ -1,28 +1,26 @@
-
 let lastUrl = location.href;
 const url = location.href;
+const timeouts = [];
 
-
-setInterval(() => {
- 
-    if ( location.href !== lastUrl) {
-        
-        lastUrl = location.href;
-        
-    }
-
-
-    
-}, 1000)
+const interval = setInterval(() => {
+  if (location.href !== lastUrl) {
+    lastUrl = location.href;
+  }
+}, 1000);
 
 function observeTitle(retryCount = 0) {
-  const target = document.querySelector('ytd-watch-metadata h1 > yt-formatted-string');
-    console.log("attempting to start mutation observer");
+  const target = document.querySelector(
+    "ytd-watch-metadata h1 > yt-formatted-string"
+  );
+  console.log("attempting to start mutation observer");
   if (target) {
     const observer = new MutationObserver((mutationsList) => {
       for (const mutation of mutationsList) {
-        if (mutation.type === 'childList' || mutation.type === 'characterData') {
-          console.log('Title changed:', target.textContent.trim());
+        if (
+          mutation.type === "childList" ||
+          mutation.type === "characterData"
+        ) {
+          console.log("Title changed:", target.textContent.trim());
           saveVideoTitleAndCount(target.textContent.trim(), lastUrl);
         }
       }
@@ -31,15 +29,16 @@ function observeTitle(retryCount = 0) {
     observer.observe(target, {
       childList: true,
       characterData: true,
-      subtree: true
+      subtree: true,
     });
 
-    console.log('Observer is now watching the title element.');
+    console.log("Observer is now watching the title element.");
   } else {
-    if (retryCount < 20) { // limit retries to avoid infinite loop
+    if (retryCount < 20) {
+      // limit retries to avoid infinite loop
       setTimeout(() => observeTitle(retryCount + 1), 500); // retry after 500ms
     } else {
-      console.warn('Failed to find the title element after multiple attempts.');
+      console.warn("Failed to find the title element after multiple attempts.");
     }
   }
 }
@@ -47,69 +46,25 @@ function observeTitle(retryCount = 0) {
 observeTitle();
 
 function saveVideoTitleAndCount(title, url) {
-   setTimeout(() => {
-        browser.storage.local.get([title], (result) => {
+  const timeout = setTimeout(() => {
+    browser.storage.local.get([title], (result) => {
+      let data = result[title] || { count: 0, url: url };
 
-                let data = result[title] || { count: 0, url: url };
+      data.count += 1;
 
-                data.count += 1;
-                
-                browser.storage.local.set({ [title]: data }, () => {
-                    console.log(`Saved: ${title}, watched ${data.count} times.`);
-                });
-            });
-   }, 2000)
-   
+      browser.storage.local.set({ [title]: data }, () => {
+        console.log(`Saved: ${title}, watched ${data.count} times.`);
+      });
+    });
+  }, 2000);
+
+  timeouts.push(timeout);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function clearTimeouts() {
+  timeouts.forEach((x) => clearTimeout(x));
+  clearInterval(interval);
+}
 
 // function trackVideo(url) {
 //     const videoUrl = url;
